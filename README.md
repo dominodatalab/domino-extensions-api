@@ -60,11 +60,11 @@ export platform_namespace=domino-platform
 helm delete  extendedapi -n ${platform_namespace}
 ```
 
-###Using the API
+### Using the API
 
 The API provides the following endpoints:
 
-## /api-extended/projects/beta/projects
+#### /api-extended/projects/beta/projects
 
 This is an extension of the endpoint ` /api/projects/beta/projects`
 
@@ -77,7 +77,7 @@ Mongo collection
 - `default_environment_revision_spec`
 
 
-## /api-extended/environments/beta/environments
+#### /api-extended/environments/beta/environments
 
 This is an extension of the endpoint ` /api/environments/beta/environments`
 
@@ -91,7 +91,7 @@ is enhanced by adding attributes
 
 For brevity the attribute `availableTools` is replaced with `None` 
 
-## v4-extended/autoshutdownwksrules
+#### v4-extended/autoshutdownwksrules
 
 The full endpoint inside the Domino workspace is (assuming `domino-platform` as the platform namespace)
 ```shell
