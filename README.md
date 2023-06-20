@@ -20,7 +20,7 @@ The following users can invoke the endpoints using their Domino API Key/Token:
 Currently these users can call all endpoints. In the future it is possible to allow users access to specific endpoints   
    
 
-###Installation
+### Installation
 
 From the root folder of this project run the following commands:
 
