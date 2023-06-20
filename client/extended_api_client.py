@@ -49,9 +49,9 @@ headers = {
              "Content-Type": "application/json",
              "Authorization": "Bearer " + token,
         }
-
+params={'offset':0,'limit':10000}
 url = f"http://extendedapi-svc.domino-platform.svc.cluster.local/api-extended/environments/beta/environments"
-response = requests.request("GET", url, headers=headers)
+response = requests.request("GET", url, headers=headers,params=params)
 print(response.status_code)
 environments = response.json()['environments']
 for e in environments:
@@ -60,7 +60,7 @@ for e in environments:
 ## Get All Projects enhanced with the environment id in the settings
 
 url = f"http://extendedapi-svc.domino-platform.svc.cluster.local/api-extended/projects/beta/projects"
-response = requests.request("GET", url, headers=headers)
+response = requests.request("GET", url, headers=headers,params=params)
 print(response.status_code)
 projects = response.json()['projects']
 for p in projects:
