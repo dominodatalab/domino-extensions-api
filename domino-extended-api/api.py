@@ -352,8 +352,7 @@ class EnvironmentRevisionCache:
     def get(
         self, environment_revision_id: ObjectId
     ) -> Optional[EnvironmentRevision]:
-        if environment_revision_id not in self.cache:
-            self.refresh_cache()
+        self.refresh_cache()
         return self.cache.get(environment_revision_id)
 
     def try_get_by_environment(
@@ -402,8 +401,8 @@ class ProjectsCache:
     def get(
         self, project_id: ObjectId
     ) -> Optional[Project]:
-        if project_id not in self.cache:
-            self.refresh_cache()
+
+        self.refresh_cache()
         return self.cache.get(project_id)
 
     def try_get_by_project(
