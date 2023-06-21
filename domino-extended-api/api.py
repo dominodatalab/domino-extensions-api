@@ -285,6 +285,13 @@ def _get_docker_image_and_base_docker_image(revision_id:ObjectId,version_no:int)
     return docker_image,docker_image_status_message
 
 
+@app.route("/api-extended/refresh_cache", methods=["GET"])
+def refresh_cache():
+    ENVIRONMENT_REVISION_CACHE.refresh_cache()
+    PROJECTS_CACHE.refresh_cache()
+    return {"EnvironmentReviewCacheRefreshed": True,
+            "ProjectsCacheRefreshed": True}
+
 @app.route("/api-extended/environments/beta/environments", methods=["GET"])
 def get_enchanced_env_revisions():
     logger.warning(f'Extended API Endpoint /api-extended/projects/beta/projects invoked')
@@ -352,7 +359,8 @@ class EnvironmentRevisionCache:
     def get(
         self, environment_revision_id: ObjectId
     ) -> Optional[EnvironmentRevision]:
-        self.refresh_cache()
+        if environment_revision_id not in self.cache:
+            self.refresh_cache()
         return self.cache.get(environment_revision_id)
 
     def try_get_by_environment(
@@ -401,8 +409,8 @@ class ProjectsCache:
     def get(
         self, project_id: ObjectId
     ) -> Optional[Project]:
-
-        self.refresh_cache()
+        if project_id not in self.cache:
+            self.refresh_cache()
         return self.cache.get(project_id)
 
     def try_get_by_project(

@@ -64,6 +64,13 @@ helm delete  extendedapi -n ${platform_namespace}
 
 The API provides the following endpoints:
 
+#### /api-extended/refresh_cache
+
+Invoke this endpoint if you want to refresh all caches. To avoid having to read Mongo repeatedly,
+the EnvironmentRevision and Project information from the Mongo collections are cached.
+
+If you want to refresh the cache invoke this method
+
 #### /api-extended/projects/beta/projects
 
 This is an extension of the endpoint ` /api/projects/beta/projects`
