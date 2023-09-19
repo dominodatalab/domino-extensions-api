@@ -18,6 +18,8 @@ spec:
     spec:
       nodeSelector:
         dominodatalab.com/node-pool: platform
+      serviceAccountName: operator-webhook
+      automountServiceAccountToken: true  
       containers:
       - name: "{{ .Values.env.name }}"
         securityContext:

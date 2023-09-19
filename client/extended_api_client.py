@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-api_host = os.environ.get("EXTENDED_API_HOST", "domino-extendedapi-svc.domino-platform")
+api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-platform")
 api_port = os.environ.get("EXTENDED_API_PORT", "80")
 url = f"http://{api_host}:{api_port}/v4-extended/autoshutdownwksrules"
 

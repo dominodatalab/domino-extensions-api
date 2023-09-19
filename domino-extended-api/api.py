@@ -10,6 +10,10 @@ import os
 import sys
 import requests
 from mongo import MONGO_DATABASE
+from domsed_api import domsed_api
+import utils
+
+
 
 DEFAULT_PLATFORM_NAMESPACE = "domino-platform"
 WHO_AM_I_ENDPOINT = "v4/auth/principal"
@@ -25,8 +29,7 @@ USER_ID = "userId"
 
 logger = logging.getLogger("extended-api")
 app = Flask(__name__)
-
-
+app.register_blueprint(domsed_api)
 
 
 def create_database_connection():
@@ -51,21 +54,7 @@ def create_database_connection():
     return MongoClient(mongo_uri)[db_name]
 
 
-def is_user_authorized(headers):
-    url: str = os.path.join(DOMINO_NUCLEUS_URI, WHO_AM_I_ENDPOINT)
-    ret: Dict = requests.get(url, headers=headers)
-    if ret.status_code == 200:
-        user: str = ret.json()
-        user_name: str = user["canonicalName"]
-        logger.warning(f'Extended API Invoking User {user_name}')
-        is_admin: bool = user["isAdmin"]
-        if is_admin:  # Admins can update mutations
-            logger.warning(f"User {user_name} allowed because user is a Domino Admin")
-            return True
-        else:
-            return False
-    else:
-        raise Exception(str(ret.status_code) + " - Error getting user status")
+
 
 
 def get_central_config_parameters(client: MongoClient):
@@ -128,13 +117,6 @@ def get_central_config_parameters(client: MongoClient):
         wks_notification_duration,
     )
 
-def _get_headers(headers):
-    new_headers = {}
-    if 'X-Domino-Api-Key' in headers:
-        new_headers['X-Domino-Api-Key'] = headers['X-Domino-Api-Key']
-    elif 'Authorization' in headers:
-        new_headers['Authorization'] = headers['Authorization']
-    return new_headers
 
 """
 1. Get all info on domino autoshutdown from central config
@@ -149,9 +131,9 @@ def _get_headers(headers):
 @app.route("/v4-extended/autoshutdownwksrules", methods=["POST"])
 def apply_autoshutdown_rules() -> object:
     logger.warning(f'Extended API Endpoint /v4-extended/autoshutdownwksrules invoked')
-    headers = _get_headers(request.headers)
+    headers = utils.get_headers(request.headers)
     try:
-        if not is_user_authorized(headers):
+        if not utils.is_user_authorized(headers):
             return Response(
                 "Unauthorized - Must be Domino Admin or one of the allowed users",
                 403,
@@ -296,7 +278,7 @@ def refresh_cache():
 def get_enchanced_env_revisions():
     logger.warning(f'Extended API Endpoint /api-extended/projects/beta/projects invoked')
     params = request.args
-    resp = requests.get(f"{DOMINO_NUCLEUS_URI}/api/environments/beta/environments",headers=_get_headers(request.headers),params=params)
+    resp = requests.get(f"{DOMINO_NUCLEUS_URI}/api/environments/beta/environments",headers=utils.get_headers(request.headers),params=params)
     new_envs=[]
     if(resp.status_code==200):
         environments = resp.json()['environments']
@@ -322,7 +304,7 @@ def get_enchanced_env_revisions():
 def get_enchanced_projects():
     logger.warning(f'Extended API Endpoint /api-extended/projects/beta/projects invoked')
     params = request.args
-    resp = requests.get(f"{DOMINO_NUCLEUS_URI}/api/projects/beta/projects",headers=_get_headers(request.headers),params=params)
+    resp = requests.get(f"{DOMINO_NUCLEUS_URI}/api/projects/beta/projects",headers=utils.get_headers(request.headers),params=params)
     new_projects=[]
     if(resp.status_code==200):
         projects = resp.json()['projects']
@@ -338,6 +320,7 @@ def get_enchanced_projects():
 
 @app.route("/healthz")
 def alive():
+     
     return "{'status': 'Healthy'}"
 
 
@@ -454,7 +437,7 @@ if __name__ == "__main__":
         level=lvl,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    log = logging.getLogger("werkzeug")
+    log = logging.getLogger("extendedapi_server")
     log.setLevel(logging.WARNING)
 
     logger.warning(MONGO_DATABASE.client)

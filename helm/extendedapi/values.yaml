@@ -1,7 +1,7 @@
 image:
   repository: quay.io/domino
   container: extendedapi
-  appVersion: v0.0.2
+  appVersion: domsed
   pullPolicy: Always
 
 env:
