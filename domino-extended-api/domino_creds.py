@@ -51,26 +51,29 @@ field_namespace: str = os.environ.get("SYSTEM_NAMESPACE",
 
 
 class DominoSystemCred:
-
     def __init__(self):
         self._cred_data = get_domino_creds_from_secret()
 
-    def get_mongo_creds(self) -> Tuple[str, str]:
+    @property
+    def mongo_creds(self) -> Tuple[str, str]:
         return (
             self._cred_data["mongodb"]["admin_username"],
             self._cred_data["mongodb"]["admin_password"],
         )
 
-    def get_mongo_creds_object(self) -> Dict:
+    @property
+    def mongo_creds_object(self) -> Dict:
         return self._cred_data["mongodb"]
 
-    def get_keycloak_creds(self) -> Tuple[str, str]:
+    @property
+    def keycloak_creds(self) -> Tuple[str, str]:
         return (
             self._cred_data["keycloak"]["username"],
             self._cred_data["keycloak"]["password"],
         )
 
-    def get_grafana_creds(self) -> Tuple[str, str]:
+    @property
+    def grafana_creds(self) -> Tuple[str, str]:
         return (
             self._cred_data["grafana"]["admin_username"],
             self._cred_data["grafana"]["admin_password"],
@@ -82,25 +85,13 @@ class DominoSystemCred:
 
 class MongoDBDetails:
 
-    def __init__(self, dominosystemcred: DominoSystemCred):
-        self.admin_username = dominosystemcred.get_mongo_creds_object()[
-            "admin_username"
-        ]
-        self.admin_password = dominosystemcred.get_mongo_creds_object()[
-            "admin_password"
-        ]
-        self.metrics_username = dominosystemcred.get_mongo_creds_object()[
-            "metrics_username"
-        ]
-        self.metrics_password = dominosystemcred.get_mongo_creds_object()[
-            "metrics_password"
-        ]
-        self.domino_username = dominosystemcred.get_mongo_creds_object()[
-            "domino_username"
-        ]
-        self.domino_password = dominosystemcred.get_mongo_creds_object()[
-            "domino_password"
-        ]
+    def __init__(self, dominocred: DominoSystemCred):
+        self.admin_username = dominocred.mongo_creds_object["admin_username"]
+        self.admin_password = dominocred.mongo_creds_object["admin_password"]
+        self.metrics_username = dominocred.mongo_creds_object["metrics_username"]
+        self.metrics_password = dominocred.mongo_creds_object["metrics_password"]
+        self.domino_username = dominocred.mongo_creds_object["domino_username"]
+        self.domino_password = dominocred.mongo_creds_object["domino_password"]
 
 
 def get_domino_creds_from_secret():

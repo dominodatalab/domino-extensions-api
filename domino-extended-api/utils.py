@@ -27,8 +27,10 @@ def is_user_authorized(headers):
         logger.warning(f"Extended API Invoking User {user_name}")
         is_admin: bool = user["isAdmin"]
         if is_admin:  # Admins can update mutations
-            logger.warning(f"User {user_name} allowed because user is \
-                           a Domino Admin")
+            logger.warning(
+                f"User {user_name} allowed because user is \
+                           a Domino Admin"
+            )
             return True
         else:
             return False

@@ -79,8 +79,10 @@ def apply_mutation() -> object:
             )
     except Exception as e:
         logger.exception(e)
-        logger.warning(f"Mutation {mutation['metadata']['name']} \
-                       failed to apply")
+        logger.warning(
+            f"Mutation {mutation['metadata']['name']} \
+                       failed to apply"
+        )
 
 
 @domsed_api.route("/mutation/<name>", methods=["DELETE"])
