@@ -12,7 +12,8 @@ rules:
   - "create"
   - "update"
   - "patch"
-  - "list"  
+  - "list" 
+  - "delete" 
 - apiGroups:
   - ""
   resources:
