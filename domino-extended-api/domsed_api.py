@@ -1,12 +1,20 @@
-from typing import Dict, List
+"""Domino domsed_api module Module.
 
-from flask import Flask, request, Response,Blueprint  # type: ignore
+This module implements a functions/endpoints to for domsed api.
+
+Example:
+    List mutation(GET) : /mutation/list
+    Get mutation(GET) : /mutation/<name>
+
+    domino_system_cred.get_mongo_creds()
+"""
+
+from flask import request, Response, Blueprint  # type: ignore
 import logging
-import json
 from kubernetes import client, config
 from kubernetes.client import ApiClient, CustomObjectsApi
 
-import os, sys
+import os
 import utils
 
 domsed_api = Blueprint("domsed_api", __name__)
@@ -65,12 +73,14 @@ def apply_mutation() -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or readonlysupport user",
+                "Unauthorized to list mutations because not an admin \
+                    or readonlysupport user",
                 403,
             )
     except Exception as e:
         logger.exception(e)
-        logger.warning(f"Mutation {mutation['metadata']['name']} failed to apply")
+        logger.warning(f"Mutation {mutation['metadata']['name']} \
+                       failed to apply")
 
 
 @domsed_api.route("/mutation/<name>", methods=["DELETE"])
@@ -90,7 +100,8 @@ def delete_mutation(name: str) -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or readonlysupport user",
+                "Unauthorized to list mutations because not an admin or \
+                      readonlysupport user",
                 403,
             )
     except Exception as e:
@@ -111,7 +122,8 @@ def get_mutation(name: str) -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or readonlysupport user",
+                "Unauthorized to list mutations because not an admin or \
+                    readonlysupport user",
                 403,
             )
     except Exception as e:
@@ -121,7 +133,7 @@ def get_mutation(name: str) -> object:
 
 @domsed_api.route("/mutation/list", methods=["GET"])
 def list_mutations():
-    logger.warning(f"/mutation/list")
+    logger.warning("/mutation/list")
     try:
         logger.warning(request.headers)
         if utils.is_user_authorized(utils.get_headers(request.headers)):
@@ -130,10 +142,10 @@ def list_mutations():
             )
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or readonlysupport user",
+                "Unauthorized to list mutations because not an admin or \
+                      readonlysupport user",
                 403,
             )
     except Exception as e:
         logger.exception(e)
-        logger.warning(f"Failed to list mutations")
-
+        logger.warning("Failed to list mutations")

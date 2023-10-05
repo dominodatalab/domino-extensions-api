@@ -11,6 +11,7 @@ env:
   namespace:
     platform: domino-platform
     compute: domino-compute
+    field: domino-field
 istio:
   enabled: false
 

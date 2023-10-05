@@ -1,4 +1,4 @@
-kind: Role
+kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: "{{ .Values.env.name }}"
@@ -7,6 +7,16 @@ rules:
   - apps.dominodatalab.com
   resources:
   - "mutations"
+  verbs:
+  - "get"
+  - "create"
+  - "update"
+  - "patch"
+  - "list"  
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
   verbs:
   - "get"
   - "create"

@@ -1,26 +1,33 @@
+"""mongodb Module.
+
+This module implements a functions for creating mongodb connections.
+
+"""
 import os
 import logging
 
 from pymongo import MongoClient  # type: ignore
 from urllib.parse import quote_plus
+from domino_creds import MongoDBDetails, domino_system_cred
+
 
 logger = logging.getLogger(__name__)
+DEFAULT_PLATFORM_NAMESPACE = "domino-platform"
+
+platform_namespace: str = os.environ.get(
+    "PLATFORM_NAMESPACE", DEFAULT_PLATFORM_NAMESPACE
+)
 
 
 def create_database_connection():
-    if os.environ.get("MONGO_PASSWORD") is None:
-        return []
 
-    platform_namespace = os.environ.get(
-        "PLATFORM_NAMESPACE", "domino-platform"
-    )
     host = os.environ.get(
         "MONGO_HOST",
         f"mongodb-replicaset.{platform_namespace}.svc.cluster.local:27017",
     )
-
-    username = quote_plus(os.environ.get("MONGO_USERNAME", "admin"))
-    password = quote_plus(os.environ["MONGO_PASSWORD"])
+    mongo_details = MongoDBDetails(domino_system_cred)
+    username = quote_plus(mongo_details.admin_username)
+    password = quote_plus(mongo_details.admin_password)
 
     db_name = quote_plus(os.environ.get("MONGO_DB_NAME", "domino"))
     if username == "admin":

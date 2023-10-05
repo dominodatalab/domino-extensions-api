@@ -52,11 +52,6 @@ spec:
         env:
         - name: PLATFORM_NAMESPACE
           value: {{ .Values.env.namespace.platform }}
-        - name: MONGO_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: mongodb-replicaset-admin
         volumeMounts:
           - name: certs
             mountPath: /ssl
