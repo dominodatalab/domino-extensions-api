@@ -1,8 +1,8 @@
 """Domino Creds Module.
 
-This module implements a retrieves the credentials for different components
-within domino(ex mongodb,keycloak) import the module and variable d
-omino_system_cred should have functions to retrive the appropriate creds.
+This module has functionalality to retrieve credentials for different components
+within domino(ex mongodb,keycloak). by importing the module and variable 
+domino_system_cred should have functions to retrive the appropriate creds.
 
 Example:
     import domino_system_cred from domino_creds

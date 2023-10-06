@@ -1,6 +1,6 @@
 """Domino domsed_api module Module.
 
-This module implements a functions/endpoints to for domsed api.
+This module implements a functions/endpoints for domsed api.
 
 Example:
     List mutation(GET) : /mutation/list
