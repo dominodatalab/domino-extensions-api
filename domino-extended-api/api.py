@@ -101,7 +101,7 @@ def get_central_config_parameters(client: MongoClient):
 """
 
 
-@app.route("/autoshutdown/interval", methods=["POST"])
+@app.route("/workspaceautoshutdown/interval", methods=["POST"])
 def apply_autoshutdown_rules() -> object:
     logger.warning(f"Extended API Endpoint /v4-extended/autoshutdownwksrules invoked")
     headers = utils.get_headers(request.headers)

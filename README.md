@@ -43,6 +43,7 @@ This API Service supports endpoints which are broadly classified into two major 
    decorate the returned objects with additional details.
 2. **Central Management of Workspace Autoshutdown Rules** - These are endpoints provided to enable administrator actions
    not currently supported via endpoints.
+3. **Domsed WebClient** - Endpoints to manage (list/create/update/delete) Domsed mutations.
    
 
 ### Extending the existing API
@@ -88,7 +89,7 @@ Currently there are two levers to manage the workspace auto-shutdown intervals:
    
    These endpoints support a Domino Administrator to centrally manage an individual users workspace auto-shutdown interval.   
 
-### `/autoshutdown/interval`
+#### Workspace auto-shutdown interval management `/workspaceautoshutdown/interval`
 
 The full endpoint inside the Domino workspace is (assuming `domino-platform` as the platform namespace)
 ```shell
@@ -146,9 +147,41 @@ Likewise for the values provided for each user in the `users` attribute
 If not, the auto shutdown duration is capped at the value of `com.cerebro.domino.workspaceAutoShutdown.globalMaximumLifetimeInSeconds`
 
 
-Copy its content to a workbook and try it out.
+### Domsed Webclient
+
+These endpoints allow managing Domsed mutations from a Domino Admin workspace
+
+#### List Mutations `/mutation/list`(GET)
+
+List all mutations. 
+
+Invoke using python client code `client.domsed_webclient.list`
+
+#### Get Mutation `/mutation/<name>`(GET)
+
+Get the definition of a mutation with name = `<name>`
+
+Invoke using python client code `client.domsed_webclient.get(name)`
+
+
+
+#### Delete Mutation `/mutation/<name>`(DELETE)
+
+Delete mutation with name = `<name>`
+
+Invoke using python client code `client.domsed_webclient.delete(name)`
+
+#### Apply Mutation `/mutation/apply`(POST)
+
+Apply mutation. It takes the mutation yaml file in JSON format
+
+Invoke using python client code `client.domsed_webclient.apply_file(yaml_file_name)`
+
+Invoke using python client code `client.domsed_webclient.apply(mutation_json)`
 
 ## Motivating Use-cases and Client Code
+
+The following lists the use-cases which motivated the endpoints in this service
 
 ### Prepare Environment for Archival
 
@@ -160,6 +193,7 @@ all the environments that are derived from the `to-be-archived` environment.
    
 The `/api-extended/projects/beta/projects` supports identifying all the projects which use the to-be-archived environment and its
 derivatives (obtained from the previous call). You can use this information to update the default environment of these projects
+
 ```python
 import requests
 import json
