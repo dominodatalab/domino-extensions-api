@@ -103,7 +103,7 @@ def get_central_config_parameters(client: MongoClient):
 
 @app.route("/workspaceautoshutdown/interval", methods=["POST"])
 def apply_autoshutdown_rules() -> object:
-    logger.warning(f"Extended API Endpoint /v4-extended/autoshutdownwksrules invoked")
+    logger.warning(f"Extended API Endpoint /workspaceautoshutdown/interval invoked")
     headers = utils.get_headers(request.headers)
     try:
         if not utils.is_user_authorized(headers):
@@ -121,13 +121,18 @@ def apply_autoshutdown_rules() -> object:
             wks_notification_duration,
         ) = get_central_config_parameters(MONGO_DATABASE)
         logger.warning("Collected auto-shutdown values from central config")
+        logger.warning(f"wks_auto_shutdown_enabled= {wks_auto_shutdown_enabled}")
+        logger.warning(f"global_max_lifetime= {global_max_lifetime}")
+        logger.warning(f"global_default_lifetime= {global_default_lifetime}")
+        logger.warning(f"wks_notification_enabled= {wks_notification_enabled}")
+        logger.warning(f"wks_notification_duration= {wks_notification_duration}")
         if not wks_auto_shutdown_enabled:
             return {
                 "msg": "com.cerebro.domino.workloadNotifications.isEnabled is False. No changes made"
             }
         elif global_default_lifetime == 0:
             return {
-                "msg": "com.cerebro.domino.workloadNotifications.defaultPeriodInSeconds not set. No changes made"
+                "msg": "com.cerebro.domino.workspaceAutoShutdown.globalDefaultLifetimeInSeconds not set. No changes made"
             }
         elif global_default_lifetime > global_max_lifetime:
             return {
@@ -156,6 +161,7 @@ def apply_autoshutdown_rules() -> object:
             )
 
             for r in result:
+                wks_lifetime=0
                 user_id = r["loginId"]["id"]
                 user_preference = {}
                 if user_id in domino_users:
