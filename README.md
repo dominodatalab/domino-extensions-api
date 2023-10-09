@@ -17,21 +17,31 @@ or run
 ```shell
 ./create_and_push_docker_image.sh ${tag}
 ```
-2. Use Helm to Install
+2. ## Use Helm to Install
+Check if you have domino-field namespace in the current cluster, if not create domino-field namespace
 ```shell
-export platform_namespace=domino-platform
-helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
+kubectl get ns
+``` 
+if domino-field namspace is not present create using below command
+```shell
+kubectl create namespace domino-field
+```
+Install using Helm
+
+```shell
+export field_namespace=domino-field
+helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
 ```
 3. To upgrade use helm
 ```shell
-export platform_namespace=domino-platform
-helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
-
+export field_namespace=domino-field
+helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
+```
 4. To delete use helm 
 
 ```shell
-export platform_namespace=domino-platform
-helm delete  extendedapi -n ${platform_namespace}
+export field_namespace=domino-field
+helm delete  extendedapi -n ${field_namespace}
 ```
 
 ## Using the API
