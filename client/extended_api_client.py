@@ -5,6 +5,11 @@ import os
 api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-field")
 api_port = os.environ.get("EXTENDED_API_PORT", "80")
 
+verify_cert=False
+cert=os.environ.get('DOMINO_EXTENDED_API_SSL_CERT')
+if cert:
+    verify_cert = cert
+
 
 url = f"http://{api_host}:{api_port}/autoshutdown/interval"
 payload = json.dumps(
@@ -17,6 +22,7 @@ headers = {
     "X-Domino-Api-Key": os.environ.get("DOMINO_USER_API_KEY"),
     "Content-Type": "application/json",
 }
+
 
 response = requests.request("POST", url, headers=headers, data=payload)
 

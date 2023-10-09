@@ -13,8 +13,10 @@ logging.basicConfig(
 )
 log = logging.getLogger("werkzeug")
 log.setLevel(logging.WARNING)
-default_api_endpoint = 'https://extendedapi-svc.domino-field.svc.cluster.local'
+default_api_endpoint = 'http://extendedapi-svc.domino-field.svc.cluster.local'
 api_endpoint = os.environ.get('DOMSED_WEBCLIENT_ENDPOINT',default_api_endpoint)
+
+
 def list():
     auth_key = requests.get(os.environ.get('DOMINO_API_PROXY') + '/access-token').text
     listing_url = f'{api_endpoint}/mutation/list'
@@ -22,7 +24,6 @@ def list():
     resp = requests.get(listing_url, headers={"Authorization": f"Bearer {auth_key}"})
 
     if(resp.status_code==200):
-
         mutations_json:Dict = resp.json()
         mutations:List = mutations_json['items']
         for m in mutations:
