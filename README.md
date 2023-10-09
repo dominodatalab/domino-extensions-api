@@ -19,19 +19,24 @@ or run
 ```
 2. Use Helm to Install
 ```shell
-export platform_namespace=domino-platform
-helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
+
+export field_namespace=domino-field
+helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
+kubectl get secret extendedapi-certs --namespace=domino-field -o yaml | sed 's/namespace: .*/namespace: domino-compute/' | kubectl apply -f -
 ```
 3. To upgrade use helm
 ```shell
-export platform_namespace=domino-platform
-helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
-
+export field_namespace=domino-field
+helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
+kubectl delete secret extendedapi-certs -n {domino-field }
+kubectl get secret extendedapi-certs --namespace=domino-field -o yaml | sed 's/namespace: .*/namespace: domino-compute/' | kubectl apply -f -
+````
 4. To delete use helm 
 
 ```shell
-export platform_namespace=domino-platform
-helm delete  extendedapi -n ${platform_namespace}
+export field_namespace=domino-field
+helm delete  extendedapi -n ${field_namespace}
+kubectl delete secret extendedapi-certs -n {field_namespace}
 ```
 
 ## Using the API
