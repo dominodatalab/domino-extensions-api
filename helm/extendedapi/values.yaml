@@ -1,7 +1,7 @@
 image:
   repository: quay.io/domino
   container: extendedapi
-  appVersion: v0.0.2
+  appVersion: v1.0.0
   pullPolicy: Always
 
 env:
@@ -11,6 +11,7 @@ env:
   namespace:
     platform: domino-platform
     compute: domino-compute
+    field: domino-field
 istio:
   enabled: false
 
