@@ -7,7 +7,7 @@ from pymongo import MongoClient  # type: ignore
 import os
 import sys
 import requests
-from mongo import MONGO_DATABASE
+
 from domsed_api import domsed_api
 import utils
 from mongo import create_database_connection
@@ -167,7 +167,7 @@ def apply_autoshutdown_rules() -> object:
                 if user_id in domino_users:
                     wks_lifetime = int(domino_users[user_id])
                     logger.warning(
-                        f"Override user {user_id} to autoshutdown in {wks_lifetime} seconds"
+                        f"Override user {user_id} - autoshutdown in {wks_lifetime} seconds"
                     )
                 elif payload["override_to_default"]:
                     wks_lifetime = global_default_lifetime
@@ -184,8 +184,13 @@ def apply_autoshutdown_rules() -> object:
                 user_preference[ENABLE_WKS_AUTO_SHUTDOWN] = wks_auto_shutdown_enabled
                 if wks_lifetime > 0:
                     user_preference[MAX_WKS_LIFETIME] = wks_lifetime
-                else:
-                    user_preference.pop(MAX_WKS_LIFETIME, -1)
+                    query = {"userId": r["_id"]}
+                    user_pref_coll.update_one(query, {"$set": user_preference}, upsert=True)
+                    logger.warning(f"Upserted entry for user {id}")
+                    print('Updated User Preference')
+                    print(user_preference["userId"])
+                #else:
+                #    user_preference.pop(MAX_WKS_LIFETIME, -1)
 
                 if wks_notification_enabled:
                     user_preference[
@@ -194,7 +199,7 @@ def apply_autoshutdown_rules() -> object:
                     user_preference[
                         SESSION_NOTIFICATION_PERIOD
                     ] = wks_notification_duration
-                query = {"userId": r["_id"]}
+
                 id = r["_id"]
                 if wks_lifetime < 0:
                     logger.warning(f"About to delete entry for user {id}")
@@ -202,9 +207,7 @@ def apply_autoshutdown_rules() -> object:
                     logger.warning(
                         f"Deleted entry for user {id} - {result.deleted_count}"
                     )
-                user_pref_coll.update_one(query, {"$set": user_preference}, upsert=True)
-                logger.warning(f"Upserted entry for user {id}")
-                print(user_preference)
+
             return {"msg": "Workspace Shutdown Durations Updated"}
     except Exception as e:
         logger.exception(e)
@@ -413,6 +416,8 @@ class ProjectsCache:
 ENVIRONMENT_REVISION_CACHE = EnvironmentRevisionCache()
 PROJECTS_CACHE = ProjectsCache()
 MONGO_DATABASE = create_database_connection()
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         DOMINO_NUCLEUS_URI: str = sys.argv[1]
