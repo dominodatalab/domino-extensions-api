@@ -1,4 +1,4 @@
-# Domino Extended API (Field Extensions)
+# Domino Extensions API (Field Extensions)
 
 This library enables adding new API endpoints to support customer requirements 
 
@@ -9,7 +9,7 @@ From the root folder of this project run the following commands:
 1. First publish the image
 ```shell
 tag="${tag:-latest}"
-operator_image="${operator_image:-quay.io/domino/extendedapi}"
+operator_image="${operator_image:-quay.io/domino/domino-extensions-api}"
 docker build -f ./Dockerfile -t ${operator_image}:${tag} .
 docker push ${operator_image}:${tag}
 ```
@@ -33,19 +33,19 @@ Install using Helm
 
 ```shell
 export field_namespace=domino-field
-helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
+helm install -f helm/domino-extensions-api/values.yaml domino-extensions-api helm/domino-extensions-api -n ${field_namespace}
 ```
 3. To upgrade use helm
 ```shell
 export field_namespace=domino-field
-helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${field_namespace}
+helm upgrade -f helm/domino-extensions-api/values.yaml extendedapi helm/domino-extensions-api -n ${field_namespace}
 ```
 
 4. To delete use helm 
 
 ```shell
 export field_namespace=domino-field
-helm delete  extendedapi -n ${field_namespace}
+helm delete  domino-extensions-api -n ${field_namespace}
 ```
 
 ## Using the API
@@ -107,7 +107,7 @@ Currently there are two levers to manage the workspace auto-shutdown intervals:
 
 The full endpoint inside the Domino workspace is (assuming `domino-platform` as the platform namespace)
 ```shell
-http://domino-extendedapi-svc.domino-platform/v4-extended/autoshutdownwksrules
+http://domino-extensions-api-svc.domino-platform/v4-extended/autoshutdownwksrules
 ```
 
 Type : POST
@@ -267,8 +267,8 @@ import requests
 import json
 import os
 
-api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-platform")
-api_port = os.environ.get("EXTENDED_API_PORT", "80")
+api_host = "domino-extensions-api-svc.domino-platform"
+api_port = "80"
 auth_token = requests.get(os.environ.get('DOMINO_API_PROXY') + '/access-token').text
 api_key =  os.environ.get("DOMINO_USER_API_KEY")
 
