@@ -2,25 +2,7 @@
 
 This library enables adding new API endpoints to support customer requirements 
 
-
-### Who is permitted to invoke these endpoints
-
-In the root folder there is a file `extended-api-acls.json`
-```json
-{
-  "users":["fake-admin"]
-}
-```
-
-The following users can invoke the endpoints using their Domino API Key/Token:
-
-1. Domino Administrators
-2. Users listed in the `extended-api-acls.json`
-
-Currently these users can call all endpoints. In the future it is possible to allow users access to specific endpoints   
-   
-
-### Installation
+## Installation
 
 From the root folder of this project run the following commands:
 
@@ -35,45 +17,45 @@ or run
 ```shell
 ./create_and_push_docker_image.sh ${tag}
 ```
-
-2. Update the file `extended-api-acls.json` based on your access requirements. Default file below 
-   only allows Domino Administrators to update mutations 
-```json
-{
-  "users":[""]
-}
-```
-3. Use Helm to Install
+2. Use Helm to Install
 ```shell
 export platform_namespace=domino-platform
 helm install -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
 ```
-4. To upgrade use helm
+3. To upgrade use helm
 ```shell
 export platform_namespace=domino-platform
 helm upgrade -f helm/extendedapi/values.yaml extendedapi helm/extendedapi -n ${platform_namespace}
 
-5. To delete use helm 
+4. To delete use helm 
 
 ```shell
 export platform_namespace=domino-platform
 helm delete  extendedapi -n ${platform_namespace}
 ```
 
-### Using the API
+## Using the API
 
-The API provides the following endpoints:
+This API Service supports endpoints which are broadly classified into two major categories:
 
-#### /api-extended/refresh_cache
+1. **Extending the existing API** - If the objects returned by the existing endpoints are 
+   missing certain attributes, use this section of the service to invoke the existing API endpoints and
+   decorate the returned objects with additional details.
+2. **Central Management of Workspace Autoshutdown Rules** - These are endpoints provided to enable administrator actions
+   not currently supported via endpoints.
+   
+
+### Extending the existing API
+
+#### Refresh Cache - `/api-extended/refresh_cache`
 
 Invoke this endpoint if you want to refresh all caches. To avoid having to read Mongo repeatedly,
 the EnvironmentRevision and Project information from the Mongo collections are cached.
+If you want to refresh the cache invoke this method.
 
-If you want to refresh the cache invoke this method
+#### Enhanced Projects -  `/api-extended/projects/beta/projects`
 
-#### /api-extended/projects/beta/projects
-
-This is an extension of the endpoint ` /api/projects/beta/projects`
+This is an extension of the endpoint `/api/projects/beta/projects`
 
 The returned json contains an attribute `projects` which is a list of the projects the user is member of.
 
@@ -83,8 +65,7 @@ Mongo collection
 - `environment_id`
 - `default_environment_revision_spec`
 
-
-#### /api-extended/environments/beta/environments
+#### Enhanced Environments - `/api-extended/environments/beta/environments`
 
 This is an extension of the endpoint ` /api/environments/beta/environments`
 
@@ -98,7 +79,16 @@ is enhanced by adding attributes
 
 For brevity the attribute `availableTools` is replaced with `None` 
 
-#### v4-extended/autoshutdownwksrules
+### Central Management of Workspace Autoshutdown Rules
+
+Currently there are two levers to manage the workspace auto-shutdown intervals: 
+   - Central config parameter - `com.cerebro.domino.workspaceAutoShutdown.globalMaximumLifetimeInSeconds` which defines both,
+      the default value and the maximum value for the workspace auto-shutdown interval.
+   - User can choose a lower value from the `User Settings` page
+   
+   These endpoints support a Domino Administrator to centrally manage an individual users workspace auto-shutdown interval.   
+
+### `/autoshutdown/interval`
 
 The full endpoint inside the Domino workspace is (assuming `domino-platform` as the platform namespace)
 ```shell
@@ -156,6 +146,117 @@ Likewise for the values provided for each user in the `users` attribute
 If not, the auto shutdown duration is capped at the value of `com.cerebro.domino.workspaceAutoShutdown.globalMaximumLifetimeInSeconds`
 
 
-An example Python client is provided in the file `client/extended_api_client.py`.
 Copy its content to a workbook and try it out.
+
+## Motivating Use-cases and Client Code
+
+### Prepare Environment for Archival
+
+A customer wants to retire Environments periodically (say every 3 months). However, these environments are 
+actively used in a large number of projects. You cannot archive an environment (or its derivatives) without removing the environment from a 
+projects default setting. The `/api-extended/environments/beta/environments` returns
+all the environments along with their base environments. Iterating over this list will help you determine
+all the environments that are derived from the `to-be-archived` environment.
+   
+The `/api-extended/projects/beta/projects` supports identifying all the projects which use the to-be-archived environment and its
+derivatives (obtained from the previous call). You can use this information to update the default environment of these projects
+```python
+import requests
+import json
+import os
+
+api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-platform")
+api_port = os.environ.get("EXTENDED_API_PORT", "80")
+auth_token = requests.get(os.environ.get('DOMINO_API_PROXY') + '/access-token').text
+api_key =  os.environ.get("DOMINO_USER_API_KEY")
+
+url = f"http://{api_host}:{api_port}/v4-extended/autoshutdownwksrules"
+payload = json.dumps(
+    {
+        "users": {"wadkars": 3600, "integration-test": 21600},
+        "override_to_default": False,
+    }
+)
+headers = {
+    "X-Domino-Api-Key": api_key,
+    "Content-Type": "application/json",
+}
+# Or the newer, more auth standards compliant version 
+headers = {
+    "Authorization": f"Bearer {auth_token}",
+    "Content-Type": "application/json",
+}
+      
+## Update Project Settings
+project_id = "ADD HERE"
+url = f"http://nucleus-frontend.domino-platform.svc.cluster.local:80/v4/projects/{project_id}/settings"
+
+payload = json.dumps({"defaultEnvironmentId": "ADD THE ENV ID TO REPLACE WITH"})
+
+response = requests.request("PUT", url, headers=headers, data=payload)
+print(response.text)
+ ```
+
+### Manage a user's workspace auto-shutdown interval centrally via Admin endpoints
+
+The default value for `com.cerebro.domino.workspaceAutoShutdown.globalMaximumLifetimeInSeconds`  is 72 hours. Customers rarely 
+change this. Users can proactively choose a lower value by updating their user-settings but rarely have a good motivation
+to do this. Consequently workspaces keep running forever, even if idle. This causes a significant increase cloud costs. This functionality is
+provided to allow administrators to manage the auto-shutdown interval to manageable level.
+
+In the central config, configure an additional parameter
+
+`com.cerebro.domino.workspaceAutoShutdown.globalDefaultLifetimeInSeconds` (Set default to a typical working day say 10 hours)
+
+The value for this parameter should be lower than the value for the central config parameter
+
+`com.cerebro.domino.workspaceAutoShutdown.globalMaximumLifetimeInSeconds` (Default 72 hours)
+
+
+As an Domino Administrator user, run the following
+```python
+import requests
+import json
+import os
+
+api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-platform")
+api_port = os.environ.get("EXTENDED_API_PORT", "80")
+auth_token = requests.get(os.environ.get('DOMINO_API_PROXY') + '/access-token').text
+api_key =  os.environ.get("DOMINO_USER_API_KEY")
+
+url = f"http://{api_host}:{api_port}/autoshutdown/interval"
+payload = json.dumps(
+    {
+        "users": {"wadkars": 3600, "integration-test": 21600},
+        "override_to_default": False,
+    }
+)
+headers = {
+    "X-Domino-Api-Key": api_key,
+    "Content-Type": "application/json",
+}
+# Or the newer, more auth standards compliant version 
+headers = {
+    "Authorization": f"Bearer {auth_token}",
+    "Content-Type": "application/json",
+}
+
+payload = json.dumps(
+    {
+        "users": {"wadkars": 3600, "integration-test": 21600},
+        "override_to_default": False,
+    }
+)
+
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
+```
+
+
+
+   
+
+
+
 

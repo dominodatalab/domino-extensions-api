@@ -2,10 +2,11 @@ import requests
 import json
 import os
 
-api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-platform")
+api_host = os.environ.get("EXTENDED_API_HOST", "extendedapi-svc.domino-field")
 api_port = os.environ.get("EXTENDED_API_PORT", "80")
-url = f"http://{api_host}:{api_port}/v4-extended/autoshutdownwksrules"
 
+
+url = f"http://{api_host}:{api_port}/autoshutdown/interval"
 payload = json.dumps(
     {
         "users": {"wadkars": 3600, "integration-test": 21600},
@@ -68,7 +69,6 @@ for p in projects:
 
 
 ## Update Project Settings
-
 project_id = "ADD HERE"
 url = f"http://nucleus-frontend.domino-platform.svc.cluster.local:80/v4/projects/{project_id}/settings"
 
