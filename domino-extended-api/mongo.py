@@ -8,7 +8,7 @@ import logging
 
 from pymongo import MongoClient  # type: ignore
 from urllib.parse import quote_plus
-from domino_creds import MongoDBDetails, domino_system_cred
+from domino_creds import MongoDBDetails, DominoSystemCred
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,7 @@ def create_database_connection():
         "MONGO_HOST",
         f"mongodb-replicaset.{platform_namespace}.svc.cluster.local:27017",
     )
+    domino_system_cred = DominoSystemCred()
     mongo_details = MongoDBDetails(domino_system_cred)
     username = quote_plus(mongo_details.admin_username)
     password = quote_plus(mongo_details.admin_password)
@@ -35,7 +36,7 @@ def create_database_connection():
     else:
         path = "/{}".format(db_name)
     mongo_uri = "mongodb://{}:{}@{}{}".format(username, password, host, path)
-    print("mongo_uri :: ",mongo_uri)
+    logging.debug("mongo_uri :: ",mongo_uri)
     return MongoClient(mongo_uri)[db_name]
 
 
