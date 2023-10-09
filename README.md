@@ -27,6 +27,7 @@ kubectl get ns
 if domino-field namspace is not present create using below command
 ```shell
 kubectl create namespace domino-field
+kubectl label namespace domino-field  domino-compute=true
 ```
 Install using Helm
 
