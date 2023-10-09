@@ -5,9 +5,10 @@ within domino(ex mongodb,keycloak). by importing the module and variable
 domino_system_cred should have functions to retrive the appropriate creds.
 
 Example:
-    import domino_system_cred from domino_creds
+    import DominoSystemCred from domino_creds
 
-    domino_system_cred.get_mongo_creds()
+    domino_system_cred = DominoSystemCred()
+    mongo_details = MongoDBDetails(domino_system_cred)
 """
 
 import os
@@ -105,5 +106,3 @@ def get_domino_creds_from_secret():
         logger.exception(e)
         logger.warning(f"Not able to get credentials from secret  {e}")
 
-
-domino_system_cred = DominoSystemCred()
