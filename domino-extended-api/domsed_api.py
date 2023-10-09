@@ -73,8 +73,7 @@ def apply_mutation() -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin \
-                    or readonlysupport user",
+                "Unauthorized to apply mutations because not an admin",
                 403,
             )
     except Exception as e:
@@ -102,8 +101,7 @@ def delete_mutation(name: str) -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or \
-                      readonlysupport user",
+                "Unauthorized to delete mutations because not an admin",
                 403,
             )
     except Exception as e:
@@ -124,8 +122,7 @@ def get_mutation(name: str) -> object:
             return out
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or \
-                    readonlysupport user",
+                "Unauthorized to get mutation because not an admina",
                 403,
             )
     except Exception as e:
@@ -144,8 +141,7 @@ def list_mutations():
             )
         else:
             return Response(
-                "Unauthorized to list mutations because not an admin or \
-                      readonlysupport user",
+                "Unauthorized to list mutations because not an admin",
                 403,
             )
     except Exception as e:
