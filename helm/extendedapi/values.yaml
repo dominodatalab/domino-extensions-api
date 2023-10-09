@@ -3,6 +3,7 @@ image:
   container: extendedapi
   appVersion: v1.0.0
   pullPolicy: Always
+
 env:
   name: extendedapi
   service: extendedapi-svc
