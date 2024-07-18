@@ -162,3 +162,5 @@ install/
 irsa_install/
 .aws_accounts
 .DS_STORE
+client/keycloak_test.py
+client/mongo_test.py

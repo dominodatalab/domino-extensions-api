@@ -94,7 +94,21 @@ class MongoDBDetails:
         self.domino_username = dominocred.mongo_creds_object["domino_username"]
         self.domino_password = dominocred.mongo_creds_object["domino_password"]
 
+class KeyCloakDetails:
 
+    def __init__(self, dominocred: DominoSystemCred):
+        self.keycloak_username,self.keycloak_password = dominocred.keycloak_creds
+
+def get_domino_creds_from_secret():
+    try:
+        api_response = api_instance.read_namespaced_secret(
+            credential_store_name, system_namespace
+        )
+        cred_data_bytes = base64.b64decode(api_response.data["credentials"])
+        return json.loads(cred_data_bytes.decode("utf8").replace("'", '"'))
+    except Exception as e:
+        logger.exception(e)
+        logger.warning(f"Not able to get credentials from secret  {e}")
 def get_domino_creds_from_secret():
     try:
         api_response = api_instance.read_namespaced_secret(

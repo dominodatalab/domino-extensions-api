@@ -36,9 +36,9 @@ def create_database_connection():
         path = "/{}".format(db_name)
     '''
     mongo_uri = "mongodb://{}:{}@{}{}?authSource=admin".format(username, password, host, path)
-    logging.warning("mongo_uri :: ",mongo_uri)
-    print('---------')
-    print(mongo_uri)
+    #logging.warning("mongo_uri :: ",mongo_uri)
+    #print('---------')
+    #print(mongo_uri)
     return MongoClient(mongo_uri)[db_name]
 
 

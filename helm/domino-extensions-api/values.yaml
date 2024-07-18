@@ -1,7 +1,7 @@
 image:
   repository: quay.io/domino
   container: domino-extensions-api
-  appVersion: v1.0.0
+  appVersion: v1.1.0
   pullPolicy: Always
 
 env:

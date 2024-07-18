@@ -9,6 +9,7 @@ import sys
 import requests
 
 from domsed_api import domsed_api
+from user_management_api import  user_management_api
 import utils
 from mongo import create_database_connection
 
@@ -28,6 +29,7 @@ USER_ID = "userId"
 logger = logging.getLogger("extended-api")
 app = Flask(__name__)
 app.register_blueprint(domsed_api)
+app.register_blueprint(user_management_api)
 
 
 def get_central_config_parameters(client: MongoClient):
